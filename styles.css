@@ -321,6 +321,10 @@ h3 {
   padding: 16px;
 }
 
+.compare-section {
+  max-width: 920px;
+}
+
 .panel-heading,
 .section-heading {
   display: flex;
@@ -644,9 +648,9 @@ h3 {
 
 .compare-grid {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(290px, 0.34fr);
+  grid-template-columns: minmax(300px, 460px) minmax(250px, 320px);
   align-items: start;
-  gap: 12px;
+  gap: 14px;
 }
 
 .canvas-frame {
@@ -662,10 +666,13 @@ h3 {
 #previewCanvas {
   display: block;
   width: 100%;
+  height: 440px;
+  object-fit: cover;
 }
 
 .detail-panel {
-  padding: 16px;
+  min-height: 100%;
+  padding: 14px;
   box-shadow: none;
 }
 
@@ -768,6 +775,10 @@ h3 {
   .result-card canvas,
   .result-card img {
     height: 292px;
+  }
+
+  #previewCanvas {
+    height: 360px;
   }
 }
 

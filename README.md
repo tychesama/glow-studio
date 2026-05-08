@@ -42,7 +42,7 @@ Source: https://gemini.google/overview/image-generation/
 The current MVP includes a direct browser-based Gemini API path for testing:
 
 - Add a Gemini API key in the app.
-- Keep the model as `gemini-3.1-flash-image-preview` unless Gemini changes the recommended model.
+- Keep the model as `gemini-3.1-flash-image-preview` unless Gemini changes the recommended Nano Banana 2 image-editing model.
 - Check the consent box before sending the selected image.
 - Click `Generate with Nano Banana 2`.
 - If any AI request fails, the app adds a local fallback card so the gallery still completes.

@@ -389,6 +389,10 @@ function findInlineImagePart(response) {
   return parts.find((part) => part.inlineData?.data || part.inline_data?.data);
 }
 
+function isFatalGeminiError(message) {
+  return /Gemini (400|401|403|404|429)|Failed to fetch|NetworkError|API key|quota|permission|model/i.test(message);
+}
+
 async function callGeminiImageEdit(preset) {
   const apiKey = els.apiKeyInput.value.trim();
   const model = els.modelInput.value.trim() || "gemini-3.1-flash-image-preview";
@@ -408,7 +412,7 @@ async function callGeminiImageEdit(preset) {
       }
     ],
     generationConfig: {
-      responseModalities: ["IMAGE"]
+      responseModalities: ["TEXT", "IMAGE"]
     }
   };
 
@@ -422,8 +426,7 @@ async function callGeminiImageEdit(preset) {
   });
 
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || `Gemini request failed with ${response.status}.`);
+    throw new Error(await geminiErrorMessage(response));
   }
 
   const data = await response.json();
@@ -434,6 +437,17 @@ async function callGeminiImageEdit(preset) {
     throw new Error("Gemini returned no image for this look.");
   }
   return `data:${mimeType};base64,${imageData}`;
+}
+
+async function geminiErrorMessage(response) {
+  const fallback = `Gemini request failed with HTTP ${response.status}.`;
+  try {
+    const data = await response.clone().json();
+    return data?.error?.message ? `Gemini ${response.status}: ${data.error.message}` : fallback;
+  } catch (error) {
+    const text = await response.text().catch(() => "");
+    return text ? `Gemini ${response.status}: ${text}` : fallback;
+  }
 }
 
 function resultHeight() {
@@ -638,6 +652,7 @@ async function generateAiGallery() {
   state.results = [];
   renderResultsBoard();
   setStatus("Sending the selected image to Gemini for AI-edited preview cards...");
+  let firstError = "";
 
   for (let index = 0; index < presets.length; index += 1) {
     const preset = presets[index];
@@ -655,6 +670,7 @@ async function generateAiGallery() {
       if (index === 0) selectResult(result);
       setStatus(`Generated ${index + 1} of ${presets.length} AI preview cards.`);
     } catch (error) {
+      firstError = firstError || error.message;
       const fallback = {
         preset,
         engine: "local",
@@ -663,12 +679,29 @@ async function generateAiGallery() {
       state.results.push(fallback);
       renderResultsBoard();
       if (index === 0) selectResult(fallback);
-      setStatus(`Gemini failed for ${preset.name}. Added a local fallback card.`);
+      setStatus(`Gemini failed for ${preset.name}: ${error.message}`);
+      if (isFatalGeminiError(error.message)) {
+        for (let fallbackIndex = index + 1; fallbackIndex < presets.length; fallbackIndex += 1) {
+          const fallbackPreset = presets[fallbackIndex];
+          state.results.push({
+            preset: fallbackPreset,
+            engine: "local",
+            canvas: renderLocalResult(fallbackPreset, 560, resultHeight(fallbackIndex, fallbackPreset))
+          });
+        }
+        renderResultsBoard();
+        setProgress(100);
+        break;
+      }
     }
     setProgress(((index + 1) / presets.length) * 100);
   }
 
-  setStatus(`Finished ${state.results.length} preview cards. AI failures used local fallback cards.`);
+  if (firstError) {
+    setStatus(`Gemini did not complete. Local fallback cards were used. First error: ${firstError}`);
+  } else {
+    setStatus(`Generated ${state.results.length} AI preview cards.`);
+  }
   setBusy(false);
 }
 

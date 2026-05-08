@@ -663,11 +663,8 @@ async function callGeminiImageEdit(preset) {
   return `data:${mimeType};base64,${imageData}`;
 }
 
-function resultHeight(index, preset) {
-  if (preset.featured) return 720;
-  if (index % 5 === 1) return 680;
-  if (index % 4 === 0) return 460;
-  return 580;
+function resultHeight() {
+  return 680;
 }
 
 function downloadDataUrl(dataUrl, filename) {

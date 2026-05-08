@@ -8,140 +8,163 @@
 </head>
 <body>
   <main class="app-shell">
-    <header class="topbar" aria-label="Application header">
-      <div>
-        <p class="eyebrow">Beauty-editorial AI preview</p>
-        <h1>Glow Studio</h1>
+    <aside class="sidebar" aria-label="Studio navigation">
+      <a class="brand-mark" href="#" aria-label="Glow Studio home">
+        <span>G</span>
+        <strong>Glow Studio</strong>
+      </a>
+
+      <nav class="side-nav" aria-label="Main sections">
+        <a class="active" href="#resultsBoard">Gallery</a>
+        <a href="#previewCanvas">Compare</a>
+        <a href="#aiControls">AI Setup</a>
+      </nav>
+
+      <div class="sidebar-note">
+        <strong>Preview rules</strong>
+        <span>Non-medical style visualization.</span>
+        <span>Photos stay local unless you consent.</span>
       </div>
-      <div class="topbar-actions">
-        <button class="ghost-button" id="copyPromptsButton" type="button">Copy Prompts</button>
-        <button class="primary-button" id="saveSelectedButton" type="button">Save Selected</button>
-      </div>
-    </header>
+    </aside>
 
-    <section class="intro-grid" aria-label="Studio setup">
-      <article class="intro-copy">
-        <h2>Explore facial style ideas before real-world decisions.</h2>
-        <p>
-          Start with a sample face or upload your own selfie. The first view is a
-          polished gallery of generated looks, with before/after comparison ready
-          when you want a closer look.
-        </p>
-      </article>
-
-      <aside class="privacy-card" aria-label="Privacy and safety">
-        <strong>Safe preview rules</strong>
-        <span>Non-medical visualization only.</span>
-        <span>AI uploads require consent.</span>
-        <span>Results are clearly labeled as previews.</span>
-      </aside>
-    </section>
-
-    <section class="control-deck" aria-label="Image source and generation controls">
-      <div class="source-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">Step 1</p>
-            <h2>Choose a face</h2>
-          </div>
-          <span class="pill" id="sourceLabel">Sample selected</span>
-        </div>
-
-        <div class="sample-grid" id="sampleGrid" aria-label="Sample faces"></div>
-
-        <label class="upload-zone" for="selfieInput">
-          <input id="selfieInput" type="file" accept="image/*">
-          <span class="upload-icon">+</span>
-          <strong>Upload your selfie</strong>
-          <small>Use a clear front-facing image. Local previews stay in this browser.</small>
+    <div class="workspace">
+      <header class="topbar" aria-label="Application header">
+        <label class="search-field">
+          <span>Search</span>
+          <input type="search" placeholder="Search looks, prompts, presets">
         </label>
-      </div>
-
-      <div class="ai-panel">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">Step 2</p>
-            <h2>Generate looks</h2>
-          </div>
-          <span class="pill muted" id="engineLabel">Local preview mode</span>
+        <div class="topbar-actions">
+          <button class="ghost-button" id="copyPromptsButton" type="button">Copy Prompts</button>
+          <button class="primary-button" id="saveSelectedButton" type="button">Save Selected</button>
         </div>
+      </header>
 
-        <div class="engine-grid">
-          <label class="field">
-            <span>Gemini API key</span>
-            <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Optional for Nano Banana 2">
-          </label>
-          <label class="field">
-            <span>Model</span>
-            <input id="modelInput" type="text" value="gemini-3.1-flash-image-preview">
-          </label>
-        </div>
-
-        <label class="consent-row">
-          <input id="aiConsentInput" type="checkbox">
-          <span>I consent to send the selected image to Gemini for AI editing.</span>
-        </label>
-
-        <div class="generation-actions">
-          <button class="primary-button" id="generateLocalButton" type="button">Generate Local Gallery</button>
-          <button class="secondary-button" id="generateAiButton" type="button">Generate with Nano Banana 2</button>
-        </div>
-
-        <div class="progress-shell" aria-label="Generation progress">
-          <span id="progressBar"></span>
-        </div>
-        <p class="status-message" id="statusMessage" role="status">
-          Select a sample or upload a selfie, then generate the gallery.
-        </p>
-      </div>
-    </section>
-
-    <section class="results-section" aria-label="Generated transformation results">
-      <div class="section-heading">
+      <section class="hero-panel" aria-label="Studio overview">
         <div>
-          <p class="eyebrow">Step 3</p>
-          <h2>Gallery of generated looks</h2>
-        </div>
-        <p class="section-note">
-          Tap any editorial card to inspect it, compare before and after, save it,
-          or share it. Local cards are simulated previews. AI cards are labeled.
-        </p>
-      </div>
-      <div class="results-board" id="resultsBoard"></div>
-    </section>
-
-    <section class="compare-section" aria-label="Before and after comparison">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Step 4</p>
-          <h2>Compare and share</h2>
-        </div>
-        <div class="compare-toggle" role="group" aria-label="Preview mode">
-          <button class="mode-button active" type="button" data-mode="split">Split</button>
-          <button class="mode-button" type="button" data-mode="after">After</button>
-          <button class="mode-button" type="button" data-mode="before">Before</button>
-        </div>
-      </div>
-
-      <div class="compare-grid">
-        <div class="canvas-frame">
-          <canvas id="previewCanvas" width="1080" height="1350" aria-label="Before and after preview canvas"></canvas>
-        </div>
-        <aside class="detail-panel">
-          <p class="eyebrow">Selected look</p>
-          <h3 id="selectedTitle">Soft glow refresh</h3>
-          <p id="selectedDescription">
-            A gentle beauty-editorial refresh with smooth lighting and fresh cheek color.
+          <p class="eyebrow">Beauty-editorial AI preview</p>
+          <h1>Glow Studio</h1>
+          <p>
+            Explore polished facial style previews from one default portrait, or replace it with your own selfie when you are ready.
           </p>
-          <div class="tag-list" id="selectedTags"></div>
-          <div class="action-row">
-            <button class="secondary-button" id="resetButton" type="button">Reset</button>
-            <button class="primary-button" id="saveCompareButton" type="button">Save Compare</button>
-            <button class="secondary-button" id="shareButton" type="button">Share</button>
+        </div>
+        <div class="hero-metrics" aria-label="Studio status">
+          <div><strong>20</strong><span>Looks</span></div>
+          <div><strong>Local</strong><span>Default mode</span></div>
+          <div><strong>Private</strong><span>Until consent</span></div>
+        </div>
+      </section>
+
+      <section class="control-deck" aria-label="Image source and generation controls">
+        <div class="source-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Source</p>
+              <h2>Default portrait</h2>
+            </div>
+            <span class="pill" id="sourceLabel">Default selected</span>
           </div>
-        </aside>
-      </div>
-    </section>
+
+          <div class="default-source-card">
+            <img id="defaultSourcePreview" src="girl.jpg" alt="Default Glow Studio portrait">
+            <div>
+              <strong>Glass Glow reference</strong>
+              <span>The gallery starts with this portrait automatically.</span>
+            </div>
+          </div>
+
+          <label class="upload-zone" for="selfieInput">
+            <input id="selfieInput" type="file" accept="image/*">
+            <span class="upload-icon">+</span>
+            <strong>Replace with your selfie</strong>
+            <small>Use a clear front-facing image. Local previews stay in this browser.</small>
+          </label>
+        </div>
+
+        <div class="ai-panel" id="aiControls">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">AI setup</p>
+              <h2>Generate looks</h2>
+            </div>
+            <span class="pill muted" id="engineLabel">Local preview mode</span>
+          </div>
+
+          <div class="engine-grid">
+            <label class="field">
+              <span>Gemini API key</span>
+              <input id="apiKeyInput" type="password" autocomplete="off" placeholder="Optional for Nano Banana 2">
+            </label>
+            <label class="field">
+              <span>Model</span>
+              <input id="modelInput" type="text" value="gemini-3.1-flash-image-preview">
+            </label>
+          </div>
+
+          <label class="consent-row">
+            <input id="aiConsentInput" type="checkbox">
+            <span>I consent to send the selected image to Gemini for AI editing.</span>
+          </label>
+
+          <div class="generation-actions">
+            <button class="primary-button" id="generateLocalButton" type="button">Refresh Gallery</button>
+            <button class="secondary-button" id="generateAiButton" type="button">Generate with Nano Banana 2</button>
+          </div>
+
+          <div class="progress-shell" aria-label="Generation progress">
+            <span id="progressBar"></span>
+          </div>
+          <p class="status-message" id="statusMessage" role="status">
+            The default portrait is ready. Refresh the gallery or upload your own selfie.
+          </p>
+        </div>
+      </section>
+
+      <section class="results-section" aria-label="Generated transformation results">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Gallery</p>
+            <h2>Generated looks</h2>
+          </div>
+          <p class="section-note">
+            Select a card to inspect it, compare before and after, save it, or share it.
+          </p>
+        </div>
+        <div class="results-board" id="resultsBoard"></div>
+      </section>
+
+      <section class="compare-section" aria-label="Before and after comparison">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Compare</p>
+            <h2>Before and after</h2>
+          </div>
+          <div class="compare-toggle" role="group" aria-label="Preview mode">
+            <button class="mode-button active" type="button" data-mode="split">Split</button>
+            <button class="mode-button" type="button" data-mode="after">After</button>
+            <button class="mode-button" type="button" data-mode="before">Before</button>
+          </div>
+        </div>
+
+        <div class="compare-grid">
+          <div class="canvas-frame">
+            <canvas id="previewCanvas" width="1080" height="1350" aria-label="Before and after preview canvas"></canvas>
+          </div>
+          <aside class="detail-panel">
+            <p class="eyebrow">Selected look</p>
+            <h3 id="selectedTitle">Soft glow refresh</h3>
+            <p id="selectedDescription">
+              A gentle beauty-editorial refresh with smooth lighting and fresh cheek color.
+            </p>
+            <div class="tag-list" id="selectedTags"></div>
+            <div class="action-row">
+              <button class="secondary-button" id="resetButton" type="button">Reset</button>
+              <button class="primary-button" id="saveCompareButton" type="button">Save Compare</button>
+              <button class="secondary-button" id="shareButton" type="button">Share</button>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </div>
   </main>
 
   <script src="script.js"></script>

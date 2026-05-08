@@ -1,5 +1,5 @@
 const els = {
-  sampleGrid: document.querySelector("#sampleGrid"),
+  defaultSourcePreview: document.querySelector("#defaultSourcePreview"),
   resultsBoard: document.querySelector("#resultsBoard"),
   selfieInput: document.querySelector("#selfieInput"),
   uploadZone: document.querySelector(".upload-zone"),
@@ -26,32 +26,10 @@ const els = {
 
 const previewCtx = els.previewCanvas.getContext("2d");
 
-const sampleFaces = [
-  {
-    id: "sample-glass-glow",
-    name: "Glass Glow",
-    image: "girl.jpg",
-    filter: "saturate(1.06) contrast(1.02) brightness(1.02)"
-  },
-  {
-    id: "sample-rose-light",
-    name: "Rose Light",
-    image: "girl.jpg",
-    filter: "sepia(0.08) saturate(1.12) contrast(1.03) brightness(1.04)"
-  },
-  {
-    id: "sample-cool-cover",
-    name: "Cool Cover",
-    image: "girl.jpg",
-    filter: "saturate(0.94) contrast(1.06) brightness(1.02) hue-rotate(-5deg)"
-  },
-  {
-    id: "sample-soft-editorial",
-    name: "Soft Editorial",
-    image: "girl.jpg",
-    filter: "sepia(0.12) saturate(0.98) contrast(0.98) brightness(1.06)"
-  }
-];
+const defaultSource = {
+  name: "Glass Glow reference",
+  image: "girl.jpg"
+};
 
 const localGrades = {
   "soft-glow": { filter: "saturate(1.08) contrast(1.01) brightness(1.04)", tint: "rgba(255, 210, 214, 0.18)" },
@@ -184,13 +162,14 @@ const presets = [
 
 const state = {
   sourceImage: null,
-  sourceName: "Glass Glow",
-  sourceKind: "sample",
+  sourceName: defaultSource.name,
+  sourceKind: "default",
   selectedPreset: presets[0],
   selectedResult: null,
   results: [],
   mode: "split",
-  isGenerating: false
+  isGenerating: false,
+  previewObjectUrl: null
 };
 
 function setStatus(message) {
@@ -215,85 +194,6 @@ function drawRoundedRect(context, x, y, width, height, radius) {
   context.arcTo(x, y + height, x, y, radius);
   context.arcTo(x, y, x + width, y, radius);
   context.closePath();
-}
-
-function drawSampleFace(context, face, width, height) {
-  const bg = context.createLinearGradient(0, 0, width, height);
-  bg.addColorStop(0, face.background[0]);
-  bg.addColorStop(1, face.background[1]);
-  context.fillStyle = bg;
-  context.fillRect(0, 0, width, height);
-
-  context.save();
-  context.translate(width / 2, height / 2);
-
-  context.fillStyle = face.outfit;
-  context.beginPath();
-  context.ellipse(0, height * 0.35, width * 0.36, height * 0.18, 0, 0, Math.PI * 2);
-  context.fill();
-
-  context.fillStyle = face.hair;
-  context.beginPath();
-  context.ellipse(0, -height * 0.07, width * 0.31, height * 0.35, 0, 0, Math.PI * 2);
-  context.fill();
-
-  context.fillStyle = face.skin;
-  context.beginPath();
-  context.ellipse(0, -height * 0.03, width * 0.23, height * 0.31, 0, 0, Math.PI * 2);
-  context.fill();
-
-  context.fillStyle = face.hair;
-  context.beginPath();
-  context.ellipse(-width * 0.15, -height * 0.13, width * 0.12, height * 0.26, -0.45, 0, Math.PI * 2);
-  context.ellipse(width * 0.15, -height * 0.13, width * 0.12, height * 0.26, 0.45, 0, Math.PI * 2);
-  context.fill();
-
-  context.strokeStyle = "#33252a";
-  context.lineWidth = width * 0.012;
-  context.lineCap = "round";
-  context.beginPath();
-  context.moveTo(-width * 0.09, -height * 0.08);
-  context.quadraticCurveTo(-width * 0.045, -height * 0.105, 0, -height * 0.08);
-  context.moveTo(width * 0.09, -height * 0.08);
-  context.quadraticCurveTo(width * 0.045, -height * 0.105, 0, -height * 0.08);
-  context.stroke();
-
-  context.fillStyle = "rgba(45, 31, 35, 0.82)";
-  context.beginPath();
-  context.ellipse(-width * 0.075, -height * 0.005, width * 0.018, height * 0.012, 0, 0, Math.PI * 2);
-  context.ellipse(width * 0.075, -height * 0.005, width * 0.018, height * 0.012, 0, 0, Math.PI * 2);
-  context.fill();
-
-  context.strokeStyle = "rgba(70, 38, 48, 0.42)";
-  context.lineWidth = width * 0.008;
-  context.beginPath();
-  context.moveTo(0, height * 0.012);
-  context.quadraticCurveTo(width * 0.018, height * 0.075, -width * 0.012, height * 0.096);
-  context.stroke();
-
-  context.fillStyle = face.blush;
-  context.globalAlpha = 0.34;
-  context.beginPath();
-  context.ellipse(-width * 0.12, height * 0.088, width * 0.055, height * 0.027, 0, 0, Math.PI * 2);
-  context.ellipse(width * 0.12, height * 0.088, width * 0.055, height * 0.027, 0, 0, Math.PI * 2);
-  context.fill();
-  context.globalAlpha = 1;
-
-  context.fillStyle = face.lip;
-  context.beginPath();
-  context.ellipse(0, height * 0.15, width * 0.065, height * 0.018, 0, 0, Math.PI * 2);
-  context.fill();
-
-  context.restore();
-}
-
-function canvasToImage(canvas) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error("Image could not be loaded."));
-    img.src = canvas.toDataURL("image/png");
-  });
 }
 
 function loadImageFromFile(file) {
@@ -363,133 +263,6 @@ function strokeArc(context, x, y, radiusX, radiusY, start, end, color, width = 7
   context.ellipse(x, y, radiusX, radiusY, 0, start, end);
   context.stroke();
   context.restore();
-}
-
-function drawLashes(context, cx, cy, side, scale) {
-  context.save();
-  context.strokeStyle = "rgba(33, 22, 28, 0.76)";
-  context.lineWidth = 3.5 * scale;
-  context.lineCap = "round";
-  for (let i = 0; i < 5; i += 1) {
-    const offset = i * 13 * side * scale;
-    context.beginPath();
-    context.moveTo(cx + offset, cy);
-    context.quadraticCurveTo(cx + offset + 8 * side * scale, cy - 22 * scale, cx + offset + 18 * side * scale, cy - 32 * scale);
-    context.stroke();
-  }
-  context.restore();
-}
-
-function applyLocalEffect(context, id, box) {
-  const x = box.x;
-  const y = box.y;
-  const w = box.width;
-  const h = box.height;
-  const cx = x + w / 2;
-  const scale = Math.min(w, h) / 760;
-  const eyeY = y + h * 0.39;
-  const noseY = y + h * 0.52;
-  const mouthY = y + h * 0.68;
-  const chinY = y + h * 0.78;
-
-  if (id === "smoothing") {
-    context.save();
-    context.globalAlpha = 0.18;
-    context.filter = `blur(${12 * scale}px) saturate(1.08) brightness(1.07)`;
-    context.drawImage(state.sourceImage, x, y, w, h);
-    context.restore();
-  }
-
-  if (id === "skinTone") {
-    context.save();
-    context.globalCompositeOperation = "soft-light";
-    ellipse(context, cx, y + h * 0.5, w * 0.38, h * 0.4, "rgba(219, 130, 91, 0.42)", 22 * scale, 1);
-    context.restore();
-  }
-
-  if (id === "smallerNose") {
-    ellipse(context, cx, noseY, w * 0.05, h * 0.12, "rgba(255, 248, 232, 0.78)", 16 * scale, 1);
-    ellipse(context, cx - w * 0.055, noseY, w * 0.025, h * 0.1, "rgba(72, 36, 48, 0.15)", 18 * scale, 1);
-    ellipse(context, cx + w * 0.055, noseY, w * 0.025, h * 0.1, "rgba(72, 36, 48, 0.15)", 18 * scale, 1);
-  }
-
-  if (id === "fullerLips") {
-    ellipse(context, cx, mouthY, w * 0.14, h * 0.036, "rgba(199, 51, 96, 0.38)", 8 * scale, 1);
-    ellipse(context, cx, mouthY - h * 0.012, w * 0.11, h * 0.016, "rgba(255, 235, 232, 0.75)", 7 * scale, 1);
-  }
-
-  if (id === "foxEye" || id === "eyeShape") {
-    strokeArc(context, cx - w * 0.16, eyeY, w * 0.1, h * 0.034, Math.PI * 1.05, Math.PI * 1.95, "rgba(44, 25, 36, 0.72)", 7 * scale, 1.5 * scale);
-    strokeArc(context, cx + w * 0.16, eyeY, w * 0.1, h * 0.034, Math.PI * 1.05, Math.PI * 1.95, "rgba(44, 25, 36, 0.72)", 7 * scale, 1.5 * scale);
-  }
-
-  if (id === "liftedBrows") {
-    strokeArc(context, cx - w * 0.16, eyeY - h * 0.07, w * 0.12, h * 0.028, Math.PI * 1.08, Math.PI * 1.84, "rgba(77, 45, 52, 0.62)", 8 * scale, scale);
-    strokeArc(context, cx + w * 0.16, eyeY - h * 0.07, w * 0.12, h * 0.028, Math.PI * 1.16, Math.PI * 1.92, "rgba(77, 45, 52, 0.62)", 8 * scale, scale);
-  }
-
-  if (id === "sharperJawline" || id === "neckLift") {
-    strokeArc(context, cx, y + h * 0.66, w * 0.28, h * 0.18, Math.PI * 0.12, Math.PI * 0.88, "rgba(70, 39, 48, 0.28)", 18 * scale, 10 * scale);
-  }
-
-  if (id === "slimmerCheeks") {
-    ellipse(context, cx - w * 0.25, y + h * 0.57, w * 0.08, h * 0.18, "rgba(78, 42, 54, 0.24)", 22 * scale, 1);
-    ellipse(context, cx + w * 0.25, y + h * 0.57, w * 0.08, h * 0.18, "rgba(78, 42, 54, 0.24)", 22 * scale, 1);
-  }
-
-  if (id === "softerCheekbones" || id === "softBlush") {
-    ellipse(context, cx - w * 0.17, y + h * 0.56, w * 0.12, h * 0.055, "rgba(232, 92, 126, 0.28)", 20 * scale, 1);
-    ellipse(context, cx + w * 0.17, y + h * 0.56, w * 0.12, h * 0.055, "rgba(232, 92, 126, 0.28)", 20 * scale, 1);
-  }
-
-  if (id === "longerLashes") {
-    drawLashes(context, cx - w * 0.21, eyeY - h * 0.01, -1, scale);
-    drawLashes(context, cx + w * 0.13, eyeY - h * 0.01, 1, scale);
-  }
-
-  if (id === "brighterSmile") {
-    ellipse(context, cx, mouthY + h * 0.018, w * 0.13, h * 0.018, "rgba(255, 255, 246, 0.82)", 7 * scale, 1);
-  }
-
-  if (id === "alteredChin") {
-    ellipse(context, cx, chinY, w * 0.12, h * 0.05, "rgba(255, 240, 226, 0.62)", 16 * scale, 1);
-    strokeArc(context, cx, chinY - h * 0.01, w * 0.15, h * 0.06, Math.PI * 0.2, Math.PI * 0.8, "rgba(78, 43, 50, 0.22)", 9 * scale, 8 * scale);
-  }
-
-  if (id === "contour") {
-    ellipse(context, cx, y + h * 0.45, w * 0.055, h * 0.28, "rgba(255, 247, 231, 0.65)", 20 * scale, 1);
-    ellipse(context, cx - w * 0.22, y + h * 0.55, w * 0.08, h * 0.12, "rgba(86, 48, 57, 0.23)", 18 * scale, 1);
-    ellipse(context, cx + w * 0.22, y + h * 0.55, w * 0.08, h * 0.12, "rgba(86, 48, 57, 0.23)", 18 * scale, 1);
-  }
-
-  if (id === "symmetry") {
-    context.save();
-    context.strokeStyle = "rgba(139, 182, 167, 0.42)";
-    context.lineWidth = 5 * scale;
-    context.setLineDash([18 * scale, 18 * scale]);
-    context.beginPath();
-    context.moveTo(cx, y + h * 0.17);
-    context.lineTo(cx, chinY + h * 0.09);
-    context.stroke();
-    context.restore();
-  }
-
-  if (id === "underEye") {
-    ellipse(context, cx - w * 0.16, eyeY + h * 0.045, w * 0.09, h * 0.028, "rgba(255, 250, 232, 0.64)", 12 * scale, 1);
-    ellipse(context, cx + w * 0.16, eyeY + h * 0.045, w * 0.09, h * 0.028, "rgba(255, 250, 232, 0.64)", 12 * scale, 1);
-  }
-
-  if (id === "foreheadGlow") {
-    ellipse(context, cx, y + h * 0.28, w * 0.18, h * 0.055, "rgba(255, 246, 230, 0.45)", 20 * scale, 1);
-  }
-
-  if (id === "editorialLight") {
-    const glow = context.createRadialGradient(cx - w * 0.16, y + h * 0.22, 10, cx - w * 0.16, y + h * 0.22, w * 0.6);
-    glow.addColorStop(0, "rgba(255, 246, 230, 0.28)");
-    glow.addColorStop(1, "rgba(255, 246, 230, 0)");
-    context.fillStyle = glow;
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-  }
 }
 
 function applyEditorialTreatment(context, preset, box, width, height) {
@@ -781,7 +554,7 @@ function renderCompare() {
     previewCtx.fillStyle = "#251820";
     previewCtx.font = "700 52px system-ui, sans-serif";
     previewCtx.textAlign = "center";
-    previewCtx.fillText("Choose a face", canvas.width / 2, canvas.height / 2 - 20);
+    previewCtx.fillText("Loading portrait", canvas.width / 2, canvas.height / 2 - 20);
     return;
   }
 
@@ -899,17 +672,29 @@ async function generateAiGallery() {
   setBusy(false);
 }
 
-async function selectSample(face) {
+function updateSourcePreview(src) {
+  if (els.defaultSourcePreview) {
+    els.defaultSourcePreview.src = src;
+  }
+}
+
+function clearPreviewObjectUrl() {
+  if (state.previewObjectUrl) {
+    URL.revokeObjectURL(state.previewObjectUrl);
+    state.previewObjectUrl = null;
+  }
+}
+
+async function selectDefaultSource() {
   try {
-    state.sourceImage = await loadImageFromSrc(face.image);
-    state.sourceName = face.name;
-    state.sourceKind = "sample";
+    clearPreviewObjectUrl();
+    state.sourceImage = await loadImageFromSrc(defaultSource.image);
+    state.sourceName = defaultSource.name;
+    state.sourceKind = "default";
     state.selectedPreset = presets[0];
     state.selectedResult = null;
-    els.sourceLabel.textContent = "Sample selected";
-    document.querySelectorAll(".sample-card").forEach((card) => {
-      card.classList.toggle("active", card.dataset.id === face.id);
-    });
+    els.sourceLabel.textContent = "Default selected";
+    updateSourcePreview(defaultSource.image);
     await generateLocalGallery();
   } catch (error) {
     setStatus(error.message);
@@ -925,33 +710,13 @@ async function handleUpload(file) {
     state.selectedPreset = presets[0];
     state.selectedResult = null;
     els.sourceLabel.textContent = "Selfie selected";
-    document.querySelectorAll(".sample-card").forEach((card) => card.classList.remove("active"));
+    clearPreviewObjectUrl();
+    state.previewObjectUrl = URL.createObjectURL(file);
+    updateSourcePreview(state.previewObjectUrl);
     await generateLocalGallery();
   } catch (error) {
     setStatus(error.message);
   }
-}
-
-function buildSampleGrid() {
-  els.sampleGrid.innerHTML = "";
-  sampleFaces.forEach((face) => {
-    const card = document.createElement("button");
-    card.className = "sample-card";
-    card.type = "button";
-    card.dataset.id = face.id;
-    card.setAttribute("aria-label", `Use ${face.name}`);
-
-    const image = new Image();
-    image.alt = face.name;
-    image.src = face.image;
-    image.style.filter = face.filter;
-
-    const label = document.createElement("span");
-    label.textContent = face.name;
-    card.append(image, label);
-    card.addEventListener("click", () => selectSample(face));
-    els.sampleGrid.appendChild(card);
-  });
 }
 
 async function copyPrompts() {
@@ -1018,7 +783,7 @@ function wireEvents() {
   els.saveSelectedButton.addEventListener("click", () => saveResult(state.selectedResult));
   els.saveCompareButton.addEventListener("click", () => downloadCanvas(els.previewCanvas, "glow-before-after.png"));
   els.shareButton.addEventListener("click", shareSelected);
-  els.resetButton.addEventListener("click", () => selectSample(sampleFaces[0]));
+  els.resetButton.addEventListener("click", selectDefaultSource);
 
   els.modeButtons.forEach((button) => {
     button.addEventListener("click", () => {
@@ -1030,9 +795,8 @@ function wireEvents() {
 }
 
 async function init() {
-  buildSampleGrid();
   wireEvents();
-  await selectSample(sampleFaces[0]);
+  await selectDefaultSource();
 }
 
 init();

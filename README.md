@@ -1,16 +1,16 @@
 # Glow Studio
 
-Glow Studio is a beauty-editorial selfie transformation web app for women ages 18 to 55. It lets a user try a built-in reference portrait or upload a selfie, generate playful non-medical facial style variations with AI-style image editing, compare before and after views, and save or share results.
+Glow Studio is a beauty-editorial selfie transformation web app for women ages 18 to 55. It starts from one built-in reference portrait, lets a user optionally replace it with a selfie, generates playful non-medical facial style variations with AI-style image editing, compares before and after views, and saves or shares results.
 
 ## Features
 
-- Try the app with `girl.jpg` before uploading a personal photo
-- Upload a selfie directly in the browser
+- Start from the default `girl.jpg` portrait without choosing from filler samples
+- Replace the default portrait with a selfie directly in the browser
 - Generate 20 pre-defined changed-face preview cards from the selected face
 - Use polished local editorial previews without an API key
 - Optionally generate with Nano Banana 2 when a Gemini API key and consent are provided
 - Copy the exact AI prompts for all result cards
-- Pinterest-style gallery as the primary screen
+- Dashboard-style studio interface based on `reference.webp`
 - Switch between split, before, and after views
 - Save a selected result card or before/after comparison as a PNG
 - Share the selected result through the browser share sheet when supported
@@ -19,8 +19,8 @@ Glow Studio is a beauty-editorial selfie transformation web app for women ages 1
 ## MVP Direction
 
 - Visual style: beauty-editorial, polished, confident, and magazine-like.
-- Primary flow: open into the Pinterest-style generated results gallery first.
-- Input options: include the built-in `girl.jpg` reference and user selfie upload.
+- Primary flow: open into a compact dashboard with source, AI setup, gallery, and comparison areas.
+- Input options: use the built-in `girl.jpg` reference by default, with optional user selfie upload.
 - Image engine: plan for AI-style image editing with Nano Banana 2 from Gemini.
 - AI behavior: generate 20 distinct pre-defined face-change images from the selected source image.
 - Editing approach: preserve the person's identity and pose while changing only the requested facial styling details.
@@ -29,9 +29,9 @@ Glow Studio is a beauty-editorial selfie transformation web app for women ages 1
 
 ## Layout Direction
 
-The file `girl.jpg` is the visual reference for the sample face and local preview quality. The result gallery should keep a Pinterest-style masonry feel: mixed-height rounded image tiles, generous white gutters, a polished lifestyle mood, and a bold rose `Save` pill over each result card.
+The file `reference.webp` is the layout reference for the web app. The interface should follow its compact dashboard structure: left navigation rail, top utility bar, rounded white panels, restrained shadows, compact cards, and professional spacing.
 
-After a sample face is selected or a selfie is uploaded, the main experience shows 20 generated preview cards. Each card represents a pre-defined face-change combination. Tapping a card loads that look into the before/after comparison canvas.
+The file `girl.jpg` is the default face reference and local preview quality reference. The app should load it automatically, without asking the user to choose a face. After the default portrait loads or a selfie is uploaded, the main experience shows 20 generated preview cards. Each card represents a pre-defined face-change combination. Tapping a card loads that look into the before/after comparison canvas.
 
 ## AI Image Editing Plan
 
@@ -85,7 +85,7 @@ Open `index.html` in a browser. No install or build step is needed for the curre
 
 ## Manual Test Checklist
 
-- Select each built-in `girl.jpg` sample treatment
+- Confirm the default `girl.jpg` portrait loads automatically
 - Upload a selfie image
 - Generate the local gallery
 - Select several result cards

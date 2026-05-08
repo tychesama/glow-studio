@@ -7,18 +7,19 @@
 - **Stack:** Static HTML, CSS, and vanilla JavaScript for the MVP. The app includes an optional direct Gemini Nano Banana 2 test path, but production AI calls should move behind a backend or serverless function.
 
 ## Product Vision
-- Include the built-in `girl.jpg` reference portrait so users can explore the experience before uploading their own selfie.
+- Load the built-in `girl.jpg` reference portrait by default so users can explore the experience before uploading their own selfie.
 - Use AI-style image editing for final generated looks, planned around Nano Banana 2 from Gemini.
-- Make the Pinterest-style gallery the first-priority screen after image selection.
+- Make the compact dashboard and generated-look gallery the first-priority experience after the default image loads.
 - Use a beauty-editorial visual direction: polished, confident, tasteful, magazine-like, and not childish.
 - Generate 20 pre-defined changed-face images per selected face.
 - Preserve the user's identity and pose while changing only the requested facial styling details.
 - Clearly label AI-generated or AI-edited results.
 
 ## Layout Reference
-- `girl.jpg` is the visual reference for the sample face and local result quality.
-- Match its Pinterest-style masonry board: mixed-height rounded image tiles, bright white gutters, soft lifestyle polish, and a prominent rose `Save` pill on result cards.
-- After the sample reference is selected or a selfie is uploaded, generate a broad board of pre-defined changed-face previews instead of making the user build every look manually.
+- `reference.webp` is the layout reference for the website design.
+- Match its compact dashboard structure: left navigation rail, top utility bar, rounded white panels, restrained shadows, compact cards, and professional spacing.
+- `girl.jpg` is the default face reference and local result quality reference.
+- After the default reference loads or a selfie is uploaded, generate a broad board of pre-defined changed-face previews instead of making the user build every look manually.
 - Keep 20 generated preview cards visible in the results board.
 - The generated preview cards should feel like shareable beauty inspiration cards, while the main canvas stays available for before/after comparison.
 
@@ -60,7 +61,7 @@
 
 ## Testing
 - No automated tests are configured yet
-- Manually check the `girl.jpg` sample treatments, selfie upload, generated preview board, Nano Banana 2 consent/key flow, before/after comparison, result rendering, PNG saving, prompt copying, and sharing after UI changes
+- Manually check automatic default `girl.jpg` loading, selfie upload, generated preview board, Nano Banana 2 consent/key flow, before/after comparison, result rendering, PNG saving, prompt copying, and sharing after UI changes
 - Add automated tests only after a test framework exists or the user asks for one
 
 ## Git

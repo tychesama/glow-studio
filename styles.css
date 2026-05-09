@@ -83,15 +83,34 @@ button:disabled {
   text-decoration: none;
 }
 
-.brand-mark span {
+.brand-icon {
   display: grid;
   place-items: center;
   width: 34px;
   height: 34px;
-  border: 2px solid var(--accent);
+  border: 1px solid rgba(13, 111, 79, 0.22);
   border-radius: 50%;
-  color: var(--accent);
-  font-weight: 900;
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.92), transparent 30%),
+    linear-gradient(145deg, var(--rose-soft), var(--accent-soft));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72), 0 8px 18px rgba(27, 24, 21, 0.08);
+}
+
+.brand-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: var(--rose);
+}
+
+.brand-icon circle {
+  fill: var(--accent);
+}
+
+.brand-icon-smile {
+  fill: none;
+  stroke: var(--accent-dark);
+  stroke-width: 4;
+  stroke-linecap: round;
 }
 
 .brand-mark strong {
